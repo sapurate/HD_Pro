@@ -1,5 +1,6 @@
 import pymysql
-
+import SN_time
+import datetime
 
 def search_success():
     a = input("请输入批次集合：")
@@ -14,7 +15,7 @@ def search_success():
                 break
             cur.execute(
                     """SELECT COUNT(called_num) FROM project_record WHERE batch_id =
-					%s AND agent_id %s AND end_result = 4 AND ctime BETWEEN %s""" % (batch_id, agent_id, time)
+					%s AND agent_id %s AND end_result = 4 AND ctime BETWEEN %s""" % (batch_id, agent_id, SN_time)
             )
             res = cur.fetchall()
             if res[0][0] != 0:
@@ -26,7 +27,25 @@ def search_success():
             print("N")
     db.close()
 
+def S_time():
+    sql_time = input("默认查询当前时间段成功量（回车），输入l+回车查询上个时间段数据，或手动输入后回车：")
+    mon, mday, hour = SN_time.localtime().tm_mon, SN_time.localtime().tm_mday, SN_time.localtime().tm_hour
+    if sql_time == "":
+        if SN_time.localtime().tm_hour >= 12:
+            sql_time = "'2019-%s-%s 12:00:00' AND '2019-%s-%s 23:00:00'"%(mon, mday, mon, mday)
+        else:
+            sql_time = "'2019-%s-%s 00:00:00' AND '2019-%s-%s 12:00:00'"%(mon, mday, mon, mday)
+
+    if sql_time == "l":
+        if SN_time.localtime().tm_hour >= 12:
+            sql_time = "'2019-%s-%s 00:00:00' AND '2019-%s-%s 12:00:00'"%(mon, mday, mon, mday)
+        else:
+            mon = (datetime.datetime.now()+datetime.timedelta(days=-1)).strftime("%m")
+            mday = (datetime.datetime.now()+datetime.timedelta(days=-1)).strftime("%d")
+            sql_time = "'2019-%s-%s 12:00:00' AND '2019-%s-%s 23:00:00'"%(mon, mday, mon, mday)
+    return  sql_time
 
 agent = {"镇江": "= 1238", "嘉鼎": "= 1461815", "中星": "IN ('1461616','1461770')"}
-time = "'2019-10-11 12:00:00' AND '2019-10-11 23:00:00'"
-search_success()
+SN_time = S_time()
+if len(SN_time) == 47:
+    search_success()
