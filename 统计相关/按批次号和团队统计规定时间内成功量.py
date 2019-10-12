@@ -1,10 +1,11 @@
 import pymysql
 import time
 import datetime
+import os
 from openpyxl import Workbook
 
 def search_m_success():
-	a = input("请输入批次集合：")
+	a = input("请输入批次集合：时间段为%s"%SN_time)
 	b = a.split(",")
 	wb = Workbook()
 	ws = wb.active
@@ -17,23 +18,22 @@ def search_m_success():
 				print("batch_id位数错误！")
 				break
 			cur.execute("""SELECT COUNT(called_num),COUNT(IF(call_duration > 0,true,null)),COUNT(IF(end_result=4,true,null))
-FROM project_record WHERE batch_id = %s AND agent_id %s AND ctime %s"""%(batch_id,agent_id,time))
+FROM project_record WHERE batch_id = %s AND agent_id %s AND ctime %s"""%(batch_id,agent_id,SN_time))
 			res = cur.fetchall()
 			if res[0][2] != 0:
 				ws.append([batch_id, i.split("@")[1], res[0][0], res[0][1], res[0][2]])
 			else:
 				ws.append([batch_id, i.split("@")[1], "N", "N", "N"])
-
 		else:
 			ws.append(["", "", "","", "N"])
 	wb.save("C:\\Users\\Administrator\\Desktop\\sample.xlsx")
 	print("Done.")
 	db.close()
-    #open()
+    os.startfile("C:\\Users\\Administrator\\Desktop\\sample.xlsx")
 
 
 def search_success():
-	a = input("请输入批次集合：")
+	a = input("请输入批次集合：时间段为%s"%SN_time)
 	b = a.split(",")
 	db = pymysql.connect(host="172.42.28.19", user="hdzf", password="#123zhangf", db="huaplus", port=8066)
 	cur = db.cursor()
@@ -83,6 +83,7 @@ def S_time():
 
 agent = {"镇江": "= 1238", "嘉鼎": "= 1461815", "中星": "IN ('1461616','1461770')"}
 SN_time = S_time()
+
 if len(SN_time) == 47:
 	search_success()
 if len(SN_time) > 47:
