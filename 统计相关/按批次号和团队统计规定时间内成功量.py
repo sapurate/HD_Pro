@@ -6,7 +6,13 @@ from openpyxl import Workbook
 
 def search_m_success():
 	a = input("请输入批次集合：时间段为%s"%SN_time)
+	order = {}
+	c = input("请输入批次(含成功单)集合：")
+	d = c.split(",")
 	b = a.split(",")
+	for i in d:
+		if i:
+			order[i.rsplit("@",1)[0]] = i.rsplit("@",1)[1]
 	wb = Workbook()
 	ws = wb.active
 	db = pymysql.connect(host="172.42.28.19", user="hdzf", password="#123zhangf", db="huaplus", port=8066)
@@ -21,16 +27,15 @@ def search_m_success():
 FROM project_record WHERE batch_id = %s AND agent_id %s AND ctime %s"""%(batch_id,agent_id,SN_time))
 			res = cur.fetchall()
 			if res[0][2] != 0:
-				ws.append([batch_id, i.split("@")[1], res[0][0], res[0][1], res[0][2]])
+				ws.append([batch_id, i.split("@")[1], res[0][0], res[0][1], res[0][2], order[i]])
 			else:
-				ws.append([batch_id, i.split("@")[1], "N", "N", "N"])
+				ws.append([batch_id, i.split("@")[1], "N", "N", "N", "N"])
 		else:
-			ws.append(["", "", "","", "N"])
+			ws.append(["", "", "","", "", "N"])
 	wb.save("C:\\Users\\Administrator\\Desktop\\sample.xlsx")
 	print("Done.")
 	db.close()
-    os.startfile("C:\\Users\\Administrator\\Desktop\\sample.xlsx")
-
+	os.startfile("C:\\Users\\Administrator\\Desktop\\sample.xlsx")
 
 def search_success():
 	a = input("请输入批次集合：时间段为%s"%SN_time)
