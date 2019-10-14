@@ -33,10 +33,10 @@ FROM project_record WHERE batch_id = %s AND agent_id %s AND ctime %s"""%(batch_i
 				ws.append([batch_id, i.split("@")[1], "N", "N", "N", "N"])
 		else:
 			ws.append(["", "", "","", "", "N"])
-	wb.save("C:\\Users\\Administrator\\Desktop\\sample.xlsx")
+	wb.save("sample.xlsx")
 	print("Done.")
 	db.close()
-	os.startfile("C:\\Users\\Administrator\\Desktop\\sample.xlsx")
+	os.startfile("sample.xlsx")
 
 def search_success():
 	a = input("请输入批次集合：时间段为%s"%SN_time)
