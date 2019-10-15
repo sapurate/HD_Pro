@@ -3,9 +3,9 @@ import pymysql, time, datetime
 def search_m_success():
 	import os
 	from openpyxl import Workbook
+	c = input("请输入批次(含成功单)集合：")
 	a = input("请输入批次集合：时间段为%s"%SN_time)
 	order = {}
-	c = input("请输入批次(含成功单)集合：")
 	d = c.split(",")
 	b = a.split(",")
 	for i in d:
