@@ -1,11 +1,8 @@
-import pymysql
-import time
-import datetime
-import os
-from openpyxl import Workbook
-import pyperclip
+import pymysql, time, datetime
 
 def search_m_success():
+	import os
+	from openpyxl import Workbook
 	a = input("请输入批次集合：时间段为%s"%SN_time)
 	order = {}
 	c = input("请输入批次(含成功单)集合：")
@@ -39,7 +36,8 @@ FROM project_record WHERE batch_id = %s AND agent_id %s AND ctime %s"""%(batch_i
 	os.startfile("sample.xlsx")
 
 def search_success():
-	a = input("请输入批次集合：时间段为%s"%SN_time)
+	import pyperclip
+	a = input("请输入批次集合：时间段为%s："%SN_time)
 	b = a.split(",")
 	db = pymysql.connect(host="172.42.28.19", user="hdzf", password="#123zhangf", db="huaplus", port=8066)
 	cur = db.cursor()
@@ -71,8 +69,11 @@ def search_success():
 	db.close()
 	pyperclip.copy(copy)
 
-def S_time():
-	sql_time = input("默认查询当前时间段成功量（回车），输入（l+回车）查询（上个时间段）、（m+回车）查询（当月数据），或手动输入后回车：")
+def S_time(index):
+	if index == "index":
+		sql_time = ""
+	else:
+		sql_time = input("默认查询当前时间段成功量（回车），输入（l+回车）查询（上个时间段）、（m+回车）查询（当月数据），或手动输入后回车：")
 	mon, mday, hour = time.localtime().tm_mon, time.localtime().tm_mday, time.localtime().tm_hour
 	if sql_time == "":
 		if time.localtime().tm_hour >= 12:
@@ -92,15 +93,9 @@ def S_time():
 			sql_time = "BETWEEN '2019-%s-01 00:00:00' AND '2019-%s-%s 23:00:00'"%(mon, mon, mday)
 	return  sql_time
 
-mon, mday, hour = time.localtime().tm_mon, time.localtime().tm_mday, time.localtime().tm_hour
-if time.localtime().tm_hour >= 12:
-	now_time = "'2019-%s-%s 12:00:00' AND '2019-%s-%s 23:00:00'"%(mon, mday, mon, mday)
-else:
-	now_time = "'2019-%s-%s 00:00:00' AND '2019-%s-%s 12:00:00'"%(mon, mday, mon, mday)
-print("当前时间段为%s"%now_time)
+print("当前时间段为%s"%S_time(index="index"))
 agent = {"镇江": "= 1238", "嘉鼎": "= 1461815", "中星": "IN ('1461616','1461770')"}
-SN_time = S_time()
-
+SN_time = S_time(index="")
 if len(SN_time) == 47:
 	search_success()
 if len(SN_time) > 47:
