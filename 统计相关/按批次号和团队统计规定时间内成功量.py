@@ -30,10 +30,10 @@ FROM project_record WHERE batch_id = %s AND agent_id %s AND ctime %s"""%(batch_i
 				ws.append([batch_id, i.split("@")[1], "N", "N", "N", "N"])
 		else:
 			ws.append(["", "", "","", "", "N"])
-	wb.save("sample.xlsx")
+	wb.save("按批次号和团队统计规定时间内成功量.xlsx")
 	print("Done.")
 	db.close()
-	os.startfile("sample.xlsx")
+	os.startfile("按批次号和团队统计规定时间内成功量.xlsx")
 
 def search_success():
 	import pyperclip
@@ -59,12 +59,12 @@ def search_success():
 				copy = copy + "#" +str(res[0][0]) + "\n"
 				num = num + 1
 			else:
-				print("N")
-				copy = copy + "N" + "\n"
+				print("")
+				copy = copy + "" + "\n"
 
 		else:
-			print("N")
-			copy = copy + "N" + "\n"
+			print("")
+			copy = copy + "" + "\n"
 	print("共有项目%d"%num)
 	db.close()
 	pyperclip.copy(copy)
