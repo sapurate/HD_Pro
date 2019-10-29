@@ -65,7 +65,13 @@ def search_success():
 		else:
 			print("")
 			copy = copy + "" + "\n"
-	print("共有项目%d"%num)
+	cur.execute("SELECT COUNT(DISTINCT batch_id) FROM project_record WHERE ctime BETWEEN %s AND end_result = 4 AND agent_id %s"%(SN_time,agent_all))
+	res = cur.fetchall()
+	project_num = res[0][0]
+	if num == project_num:
+		print("共有项目%d"%num)
+	else:
+		print("总数不符%d and %d"%(num,project_num))
 	db.close()
 	pyperclip.copy(copy)
 
@@ -95,6 +101,7 @@ def S_time(index):
 
 print("当前时间段为%s"%S_time(index="index"))
 agent = {"镇江": "= 1238", "嘉鼎": "= 1461815", "中星": "IN ('1461616','1461770')"}
+agent_all = "IN ('1238','1239','1461815','1461616','1461770')"
 SN_time = S_time(index="")
 if len(SN_time) == 47:
 	search_success()
