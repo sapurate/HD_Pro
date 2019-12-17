@@ -1,6 +1,4 @@
-import pymysql
-import xlrd
-import sys
+import pymysql, xlrd, sys, os
 
 '''
     连接数据库
@@ -46,7 +44,7 @@ def open_excel(excel_file):
 '''
 
 
-def store_to(db_name, table_name, excel_file):
+def store_to(db_name, table_name, excel_file, city):
     db = mysql_link(db_name)  # 打开数据库连接
     cursor = db.cursor()  # 使用 cursor() 方法创建一个游标对象 cursor
 
@@ -61,7 +59,7 @@ def store_to(db_name, table_name, excel_file):
         num_max = 0
         for i in range(1, row_num):  # 第一行是标题名，对应表中的字段名所以应该从第二行开始，计算机以0开始计数，所以值是1
             row_data = sh.row_values(i)  # 按行获取excel的值
-            value = (row_data[2]+row_data[3],row_data[0], row_data[2], row_data[3], row_data[7], row_data[8], row_data[10],
+            value = (row_data[2]+row_data[3],row_data[0], city, row_data[2], row_data[3], row_data[7], row_data[8], row_data[10],
                      row_data[11], row_data[12], row_data[13], row_data[14], row_data[15], row_data[16], row_data[17],
                      row_data[18], row_data[19], row_data[20], row_data[21], row_data[22])
             list.append(value)  # 将数据暂存在列表
@@ -69,9 +67,9 @@ def store_to(db_name, table_name, excel_file):
             num_max += 1
             if (num >= 10000) or (num_max == row_num - 1):  # 每一万条数据执行一次插入
                 print(sys.getsizeof(list))
-                sql = "INSERT INTO " + table_name + " (主键, 任务, 被叫, 通话时间, 通话时长, 处理人, 接通状态,\
+                sql = "INSERT INTO " + table_name + " (主键, 任务, 归属地, 被叫, 通话时间, 通话时长, 处理人, 接通状态,\
                 部门, 用户意向, 外呼备注, 一检结果,一检备注, 二检结果, 二检备注, 沟通结果,产品名称,质检人,二次质检人,呼叫状态)\
-                VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+                VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
                 cursor.executemany(sql, list)  # 执行sql语句
 
                 num = 0  # 计数归零
@@ -85,4 +83,9 @@ def store_to(db_name, table_name, excel_file):
 
 
 if __name__ == '__main__':
-    store_to('hd', '宜昌外呼记录', 'd:\荆门外呼记录20191216170405.xlsx')
+    #遍历目录,注意文件名均为"地市.xlsx"
+    path = 'C:/Users/Fei/Desktop/外呼记录/20191216/'
+    dirs = os.listdir(path)
+    for file in dirs:
+        if file in ("荆门.xlsx", "宜昌.xlsx", "江汉.xlsx", "黄冈.xlsx", "襄阳.xlsx"):
+            store_to('hd', '外呼记录', os.path.join(path, file), file.split(".")[0])
