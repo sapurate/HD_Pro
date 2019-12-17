@@ -10,8 +10,8 @@ import pymysql, xlrd, sys, os
 
 def mysql_link(db_name):
     try:
-        db = pymysql.connect(host="123.207.121.89", user="fei",
-                             passwd="ddd123",
+        db = pymysql.connect(host="XXX", user="XXX",
+                             passwd="XXX",
                              db=db_name,
                              charset='utf8')
         return db
