@@ -10,8 +10,8 @@ import pymysql, xlrd, sys, os
 
 def mysql_link(db_name):
     try:
-        db = pymysql.connect(host="XXX", user="XXX",
-                             passwd="XXX",
+        db = pymysql.connect(host="123.207.121.89", user="fei",
+                             passwd="ddd123",
                              db=db_name,
                              charset='utf8')
         return db
@@ -84,8 +84,11 @@ def store_to(db_name, table_name, excel_file, city):
 
 if __name__ == '__main__':
     #遍历目录,注意文件名均为"地市.xlsx"
-    path = 'C:/Users/Fei/Desktop/外呼记录/20191216/'
+    path = 'C:/Users/Fei/Desktop/外呼记录/2020-01-13/'
     dirs = os.listdir(path)
     for file in dirs:
-        if file in ("荆门.xlsx", "宜昌.xlsx", "江汉.xlsx", "黄冈.xlsx", "襄阳.xlsx"):
+        if file in ("荆门.xlsx", "宜昌.xlsx", "江汉.xlsx", "黄冈.xlsx", "襄阳.xlsx",
+                    "荆门_本地.xlsx", "宜昌_本地.xlsx", "江汉_本地.xlsx", "黄冈_本地.xlsx", "襄阳_本地.xlsx"):
             store_to('hd', '外呼记录', os.path.join(path, file), file.split(".")[0])
+            os.rename(os.path.join(path, file),os.path.join(path, "AM"+file.split(".")[0]+"_已导入."+file.split(".")[1]))
+            print(file.split(".")[0]+"=====>已导入")

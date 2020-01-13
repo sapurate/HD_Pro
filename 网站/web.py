@@ -21,31 +21,34 @@ db_connection = pymysql.connect(
     )
 
 h_sql_1 = '''SELECT
- project_record.agent_id,
- agent.company_name,
- project_record.batch_id,
- batch.name,
- COUNT(project_record.called_num),
- COUNT(IF(project_record.call_duration > 0,true,null)) ,
- COUNT(DISTINCT IF(project_record.end_result=4,project_record.called_num,null)),
- (COUNT(DISTINCT IF(project_record.end_result=4,project_record.called_num,null)))/(COUNT(IF(project_record.call_duration > 0,true,null))),
- (COUNT(IF(project_record.call_duration > 0,true,null)))/(COUNT(project_record.called_num)),
- COUNT(DISTINCT project_record.uid)
+ pr.agent_id,
+ a.company_name,
+ pr.batch_id,
+ b.name,
+ COUNT(pr.called_num),
+ COUNT(IF(pr.call_duration > 0,true,null)) ,
+ COUNT(IF(pr.end_result=4,true,null)),
+#CONCAT(ROUND(COUNT(IF(`接通状态`='已接通',TRUE,NULL))/COUNT(`被叫`) * 100 ,1),'%') as '接通率', 
+CONCAT(ROUND((COUNT(IF(pr.end_result=4,true,null))/COUNT(IF(pr.call_duration > 0,true,null)))*100,1),'%'),
+CONCAT(ROUND((COUNT(IF(pr.call_duration > 0,true,null))/COUNT(pr.called_num))*100,1),'%'),
+ COUNT(DISTINCT pr.uid)
 FROM
- project_record,batch,agent
+	project_record pr,
+	batch b,
+	agent a
 WHERE
-project_record.agent_id = agent.id
+pr.agent_id = a.id
 AND
-project_record.batch_id = batch.id
+pr.batch_id = b.id
 AND
-project_record.agent_id IN (
+pr.agent_id IN (
 '1238','1239','1461815','1461770','1461616'
 )
-AND project_record.ctime BETWEEN
+AND pr.ctime BETWEEN
 '''
 
 h_sql_5min_2 = '''
-  GROUP BY project_record.agent_id,project_record.batch_id
+  GROUP BY pr.agent_id,pr.batch_id
 '''
 def ConnectToData(db_connection):
     try:
@@ -84,6 +87,7 @@ def CreateWb(filepath,wbname,sheetname):
     wb.save(filename=path.replace('\\','/'))
     return wb,ws #返回可操作的对象: 整个工作簿wb,相应工作表ws
 #if __name__ == '__main__':
+os.startfile("min_data.html")
 while(1):
 #    bef_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()-900))
     now_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
@@ -121,8 +125,10 @@ while(1):
         a.clear()
 #     print(b)
     df = pd.DataFrame(b,columns=["渠道id", "渠道名","批次id", "%s    批次名"%end_time, "外呼量","接通量","成功量","成功率","接通率","上线人数"])
-    df.to_html(r"\\Hll\湖北话加\min_data.html")
-    os.system(""">> //Hll/湖北话加/min_data.html echo ^<meta http-equiv='refresh' content='10'^>""")
+    #df.to_html(r"\\Hll\湖北话加\min_data.html")
+    #os.system(""">> //Hll/湖北话加/min_data.html echo ^<meta http-equiv='refresh' content='10'^>""")
+    df.to_html(r"min_data.html")
+    os.system(""">> min_data.html echo ^<meta http-equiv='refresh' content='10'^>""")
     print("%s刷新完毕"%end_time)
 #     read_html = pd.read_html("min_data.html")
 #     start_time1='2019-10-12 00:00:00'
